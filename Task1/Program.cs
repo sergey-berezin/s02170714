@@ -14,8 +14,7 @@ namespace Task1
 
             OnnxGeneral onnxGeneral = new OnnxGeneral(model_Path);
             Threadworks threadworks = new Threadworks(image_path, onnxGeneral);
-            if (threadworks.error != 1)
-                threadworks.Run();
+            threadworks.Run();
         }
     }
 }
