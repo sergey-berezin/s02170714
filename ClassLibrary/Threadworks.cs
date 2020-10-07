@@ -11,24 +11,29 @@ namespace ClassLibrary
         private ConcurrentQueue<string> path_Imgs;
 
         private OnnxGeneral model;
-        public int error = 0;
+        private string _path;
         public static int stop = 0;
 
         public Threadworks(string path, OnnxGeneral onnxModel)
         {
             model = onnxModel;
-
-            if (Directory.Exists(path) == false)
-            {
-                Console.WriteLine("It is a wrong images path !");
-                error = 1;
-            }
-            else
-                path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(path, "*.jpeg"));
+            _path = path;
         }
 
         public void Run()
         {
+            
+            try
+            {
+                path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(_path, "*.jpg"));
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Console.WriteLine("These files don't exist!");
+                return;
+            }
+            path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(_path, "*.jpeg"));
+            
             Console.WriteLine("Press Ctrl+C to stop threads ...");
 
             Console.CancelKeyPress += new ConsoleCancelEventHandler(myHandler);
@@ -61,8 +66,7 @@ namespace ClassLibrary
             {
                 if (wait.WaitOne(0))
                     break;
-                Console.WriteLine(th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)));
-
+                Console.WriteLine(th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name);
             }
 
             if (stop == 0)
