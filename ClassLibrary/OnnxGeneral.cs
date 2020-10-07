@@ -12,7 +12,7 @@ namespace ClassLibrary
 {
     public class OnnxGeneral
     {
-        public InferenceSession name_model;
+        private InferenceSession name_model;
         public OnnxGeneral(string modelFilePath)
         {
             name_model = new InferenceSession(modelFilePath);
