@@ -64,6 +64,7 @@ namespace ClassLibrary
             string Img_name;
             string th_name = Thread.CurrentThread.Name;
             string _result;
+            int time = 0;
             
             while (path_Imgs.TryDequeue(out Img_name))
             {
@@ -72,10 +73,11 @@ namespace ClassLibrary
                 //Console.WriteLine(th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name);
 
                 result = th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name;                
-                if(th_name == "Thread_0")
+                if(th_name == "Thread_0" && time == 0)
                 {
-                    Thread.Sleep(500);
                     results.Add(_result);
+                    Thread.Sleep(500);
+                    time++;
                     wait_for_write.Set();
                 }
                 else
