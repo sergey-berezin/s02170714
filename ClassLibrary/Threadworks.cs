@@ -72,7 +72,7 @@ namespace ClassLibrary
                     break;
                 //Console.WriteLine(th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name);
 
-                result = th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name;                
+                _result = th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name;                
                 if(th_name == "Thread_0" && time == 0)
                 {
                     results.Add(_result);
