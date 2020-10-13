@@ -7,8 +7,11 @@ namespace ClassLibrary
 {
     public class Threadworks
     {
-        private static ManualResetEvent wait = new ManualResetEvent(false);
-        private static AutoResetEvent wait_for_write = new AutoResetEvent(false);
+        private static AutoResetEvent wait_for_write = new AutoResetEvent(true);
+        
+        public static CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        public static CancellationToken token = cancelTokenSource.Token;
+        
         private ConcurrentQueue<string> path_Imgs;
 
         private OnnxGeneral model;
@@ -36,9 +39,7 @@ namespace ClassLibrary
             }
             path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(_path, "*.jpeg"));
             
-            Console.WriteLine("Press Ctrl+C to stop threads ...");
-
-            Console.CancelKeyPress += new ConsoleCancelEventHandler(myHandler);
+            Console.WriteLine("Press Enter to stop threads ...");
 
             Thread[] ths = new Thread[Environment.ProcessorCount];
 
@@ -68,30 +69,21 @@ namespace ClassLibrary
             
             while (path_Imgs.TryDequeue(out Img_name))
             {
-                if (wait.WaitOne(0))
+                if (token.IsCancellationRequested)
+                {
+                    stop++;
                     break;
-                //Console.WriteLine(th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name);
-
-                _result = th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name;                
-                if(th_name == "Thread_0" && time == 0)
-                {
-                    results.Add(_result);
-                    Thread.Sleep(500);
-                    time++;
-                    wait_for_write.Set();
-                }
-                else
-                {
-                    wait_for_write.WaitOne();
-                    results.Add(_result);
-                    wait_for_write.Set();
                 }
                 
+                _result = th_name + ": " + model.PredictModel(OnnxGeneral.ImageModel(Img_name)) + ", file path: " + Img_name;
+                wait_for_write.WaitOne();
+                results.Add(_result);
+                wait_for_write.Set();
             }
             if (stop == 0)
-                Console.WriteLine(th_name + " Stop normally !");
+                Console.WriteLine(th_name + " Stoped normally !");
             else
-                Console.WriteLine(th_name + " Stop by Ctrl+C !");
+                Console.WriteLine(th_name + " Stoped by Enter !");
         }
 
         public override string ToString()
@@ -104,12 +96,5 @@ namespace ClassLibrary
             return "\n";
         }
         
-        protected static void myHandler(object sender, ConsoleCancelEventArgs args)
-        {
-            stop = 1;
-            wait.Set();
-            Console.WriteLine("Stop threads by Ctrl+C ...");
-            args.Cancel = true;
-        }
     }
 }
