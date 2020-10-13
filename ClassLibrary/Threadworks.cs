@@ -30,7 +30,7 @@ namespace ClassLibrary
             
             try
             {
-                path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(_path, "*.jpg"));
+                path_Imgs = new ConcurrentQueue<string>(Directory.GetFiles(_path, "*.jpeg"));
             }
             catch (DirectoryNotFoundException)
             {
@@ -41,6 +41,13 @@ namespace ClassLibrary
             
             Console.WriteLine("Press Enter to stop threads ...");
 
+            var Wait_for_enter = new Thread(new ThreadStart(() =>
+            {
+                while (Console.ReadKey().Key != ConsoleKey.Enter) { }
+                Threadworks.cancelTokenSource.Cancel();
+            }));
+            Wait_for_enter.Start();                        
+            
             Thread[] ths = new Thread[Environment.ProcessorCount];
 
             for (int i = 0; i < Environment.ProcessorCount; ++i)
