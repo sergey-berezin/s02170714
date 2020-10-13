@@ -15,13 +15,6 @@ namespace Task1
             OnnxGeneral onnxGeneral = new OnnxGeneral(model_Path);
             Threadworks threadworks = new Threadworks(image_path, onnxGeneral);
             
-            var Wait_for_enter = new Thread(new ThreadStart(() =>
-            {
-                while (Console.ReadKey().Key != ConsoleKey.Enter) { }
-                Threadworks.cancelTokenSource.Cancel();
-            }));
-            Wait_for_enter.Start();            
-            
             threadworks.Run();
             threadworks.ToString();
             
